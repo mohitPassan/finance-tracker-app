@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { ItemsType } from "./columns";
 
 const formSchema = z.object({
     item: z.string(),
@@ -31,7 +32,13 @@ const formSchema = z.object({
     category: z.string(),
 });
 
-const ItemsForm = () => {
+type Props = {
+    initialData?: ItemsType;
+    isEditing?: boolean;
+    handleSubmit?: () => void;
+};
+
+const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
     const router = useRouter();
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -42,9 +49,31 @@ const ItemsForm = () => {
             type: "debit",
             category: "",
         },
+        values: {
+            item: initialData ? initialData.name : "",
+            cost: initialData ? initialData.cost : 0,
+            type: initialData ? initialData.type : "debit",
+            category: initialData ? initialData.category_id : "",
+        },
     });
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
+        if (isEditing) {
+            axios.patch("http://localhost:1323/api/v1/update/item", {
+                id: initialData?.id,
+                name: values.item,
+                cost: values.cost,
+                type: values.type,
+                category_id: values.category,
+            });
+
+            if(handleSubmit) {
+                handleSubmit();
+            }
+
+            return;
+        }
+
         await axios.post("http://localhost:1323/api/v1/item", {
             name: values.item,
             cost: values.cost,
@@ -97,6 +126,7 @@ const ItemsForm = () => {
                             <Select
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
+                                value={field.value}
                             >
                                 <FormControl>
                                     <SelectTrigger>
@@ -123,6 +153,7 @@ const ItemsForm = () => {
                             <Select
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
+                                value={field.value}
                             >
                                 <FormControl>
                                     <SelectTrigger>

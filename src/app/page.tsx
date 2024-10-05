@@ -1,7 +1,6 @@
 import { ModeToggle } from "@/components/theme-toggle";
 import { ItemsForm } from "./items-form";
-import { DataTable } from "./data-table";
-import { columns, ItemsType } from "./columns";
+import { ItemsType } from "./columns";
 import axios from "axios";
 import Link from "next/link";
 import { CircleUser, Menu, Plus } from "lucide-react";
@@ -21,6 +20,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ItemsTable } from "./items-table";
 
 export default async function Home() {
     const response = await axios.get<{ data: ItemsType[] }>(
@@ -107,7 +107,7 @@ export default async function Home() {
                 </div>
             </header>
             <div className="w-4/5">
-                <DataTable columns={columns} data={items.data} />
+                <ItemsTable items={items.data} />
                 <Sheet>
                     <SheetTrigger asChild>
                         <Button
