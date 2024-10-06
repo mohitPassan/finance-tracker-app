@@ -3,7 +3,7 @@
 import axios from "axios";
 // import { useMutation } from "@tanstack/react-query";
 import { getColumns, ItemsType } from "./columns";
-import { DataTable } from "./data-table";
+import { DataTable } from "../data-table";
 import { useRouter } from "next/navigation";
 import {
     Sheet,

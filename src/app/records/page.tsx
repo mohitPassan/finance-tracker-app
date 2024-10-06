@@ -1,5 +1,5 @@
 import { ModeToggle } from "@/components/theme-toggle";
-import { ItemsForm } from "./records/items-form";
+import axios from "axios";
 import Link from "next/link";
 import { CircleUser, Menu, Plus } from "lucide-react";
 import {
@@ -18,23 +18,15 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CategoriesVsExpenses } from "./categoriesVsExpenses";
-import { IncomeAndExpenses } from "./incomeAndExpenses";
-import { MonthlyExpenses } from "./monthlyExpenses";
-import axios from "axios";
+import { ItemsType } from "./columns";
+import { ItemsTable } from "./items-table";
+import { ItemsForm } from "./items-form";
 
 export default async function Home() {
-    const res = await axios.get("http://localhost:1323/api/v1/dashboard-data");
-
-    const categoriesVsExpensesData = res.data.data.categories;
-
-    const incomeVsExpensesData = res.data.data.incomeVsExpenses;
-    console.log(incomeVsExpensesData);
-
-    // const categoriesVsExpensesData = [
-    //     { category: "entertainment", expenses: 1369, income: 123 },
-    //     { category: "food", expenses: 632, income: 123 },
-    // ];
+    const response = await axios.get<{ data: ItemsType[] }>(
+        "http://localhost:1323/api/v1/items"
+    );
+    const items = response.data;
 
     return (
         <div className="flex flex-col gap-5 items-center">
@@ -42,13 +34,13 @@ export default async function Home() {
                 <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
                     <Link
                         href="/"
-                        className="text-foreground transition-colors hover:text-foreground"
+                        className="text-muted-foreground transition-colors hover:text-foreground"
                     >
                         Dashboard
                     </Link>
                     <Link
                         href="/records"
-                        className="text-muted-foreground transition-colors hover:text-foreground"
+                        className="text-foreground transition-colors hover:text-foreground"
                     >
                         Records
                     </Link>
@@ -70,13 +62,13 @@ export default async function Home() {
                         <nav className="grid gap-6 text-lg font-medium">
                             <Link
                                 href="/"
-                                className="text-foreground hover:text-foreground"
+                                className="text-muted-foreground hover:text-foreground"
                             >
                                 Dashboard
                             </Link>
                             <Link
                                 href="/records"
-                                className="text-muted-foreground hover:text-foreground"
+                                className="text-foreground hover:text-foreground"
                             >
                                 Records
                             </Link>
@@ -114,16 +106,8 @@ export default async function Home() {
                     </div>
                 </div>
             </header>
-            <div className="md:w-4/5 w-full pb-16">
-                <div className="grid grid-cols-1 gap-4 p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <CategoriesVsExpenses
-                            chartData={categoriesVsExpensesData}
-                        />
-                        <IncomeAndExpenses chartData={incomeVsExpensesData} />
-                    </div>
-                    <MonthlyExpenses />
-                </div>
+            <div className="md:w-4/5 w-11/12 pb-20">
+                <ItemsTable items={items.data} />
                 <Sheet>
                     <SheetTrigger asChild>
                         <Button
