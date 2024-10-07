@@ -25,7 +25,7 @@ const ItemsTable = ({ items }: Props) => {
 
     const handleDelete = (id: string) => {
         axios
-            .delete(`http://localhost:1323/api/v1/items/${id}`)
+            .delete(`${process.env.SERVER_URL}/api/v1/items/${id}`)
             .then(() => {
                 router.refresh();
             })
@@ -38,7 +38,7 @@ const ItemsTable = ({ items }: Props) => {
         setSheetOpen(true);
         axios
             .get<{ data: ItemsType }>(
-                `http://localhost:1323/api/v1/items/${id}`
+                `${process.env.SERVER_URL}/api/v1/items/${id}`
             )
             .then((res) => {
                 setDataToUpdate(res.data.data);

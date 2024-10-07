@@ -59,7 +59,7 @@ const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (isEditing) {
-            axios.patch("http://localhost:1323/api/v1/update/item", {
+            axios.patch(`${process.env.SERVER_URL}/api/v1/update/item`, {
                 id: initialData?.id,
                 name: values.item,
                 cost: values.cost,
@@ -67,14 +67,14 @@ const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
                 category_id: values.category,
             });
 
-            if(handleSubmit) {
+            if (handleSubmit) {
                 handleSubmit();
             }
 
             return;
         }
 
-        await axios.post("http://localhost:1323/api/v1/item", {
+        await axios.post(`${process.env.SERVER_URL}/api/v1/item`, {
             name: values.item,
             cost: values.cost,
             type: values.type,
