@@ -24,7 +24,7 @@ import { ItemsForm } from "./items-form";
 
 export default async function Home() {
     const response = await axios.get<{ data: ItemsType[] }>(
-        "http://localhost:1323/api/v1/items"
+        `${process.env.SERVER_URL}/api/v1/items`
     );
     const items = response.data;
 

@@ -24,7 +24,7 @@ import { MonthlyExpenses } from "./monthlyExpenses";
 import axios from "axios";
 
 export default async function Home() {
-    const res = await axios.get("http://localhost:1323/api/v1/dashboard-data");
+    const res = await axios.get(`${process.env.SERVER_URL}/api/v1/dashboard-data`);
 
     const categoriesVsExpensesData = res.data.data.categories;
 
