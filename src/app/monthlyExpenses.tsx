@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts";
-
+import { useMedia } from "use-media";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
     ChartConfig,
@@ -14,14 +14,6 @@ import {
 } from "@/components/ui/chart";
 
 export const description = "A donut chart with text";
-
-const chartData = [
-    { month: "january", expenses: 120, income: 20 },
-    { month: "february", expenses: 30, income: 120 },
-    { month: "march", expenses: 10, income: 200 },
-    { month: "april", expenses: 10, income: 1 },
-    { month: "may", expenses: 12, income: 2 },
-];
 
 const chartConfig = {
     month: {
@@ -37,7 +29,43 @@ const chartConfig = {
     },
 } satisfies ChartConfig;
 
-export function MonthlyExpenses() {
+type ChartDataItem = {
+    month: string;
+    year: string;
+    expenses: number;
+    income: number;
+};
+
+type Props = {
+    chartData: ChartDataItem[];
+};
+
+const monthMap: { [key: string]: string } = {
+    "01": "January",
+    "02": "February",
+    "03": "March",
+    "04": "April",
+    "05": "May",
+    "06": "June",
+    "07": "July",
+    "08": "August",
+    "09": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December",
+};
+
+export function MonthlyExpenses({ chartData }: Props) {
+    const currentYear = new Date().getFullYear().toString();
+    const formattedData = chartData
+        .filter((item) => item.year === currentYear)
+        .map((item) => ({
+            ...item,
+            month: monthMap[item.month],
+        }));
+
+    const isMobile = useMedia({ maxWidth: 768 });
+
     return (
         <Card className="flex flex-col">
             <CardHeader className="items-center pb-0">
@@ -46,10 +74,10 @@ export function MonthlyExpenses() {
             <CardContent className="flex-1 pb-0">
                 <ChartContainer
                     config={chartConfig}
-                    className="mx-auto aspect-square max-h-[450px]"
+                    className="mx-auto max-h-[450px] w-full aspect-square"
                 >
-                    <BarChart accessibilityLayer data={chartData}>
-                        <CartesianGrid vertical={false} />
+                    <BarChart accessibilityLayer data={formattedData}>
+                        <CartesianGrid vertical={isMobile ? false : true} />
                         <XAxis
                             dataKey="month"
                             tickLine={false}
@@ -64,14 +92,12 @@ export function MonthlyExpenses() {
                         <Bar
                             dataKey="expenses"
                             fill="var(--color-expenses)"
-                            stackId="a"
-                            radius={[0, 0, 4, 4]}
+                            stackId={isMobile ? "a" : undefined}
                         />
                         <Bar
                             dataKey="income"
                             fill="var(--color-income)"
-                            stackId="a"
-                            radius={[4, 4, 0, 0]}
+                            stackId={isMobile ? "a" : undefined}
                         />
                     </BarChart>
                 </ChartContainer>

@@ -71,6 +71,7 @@ export function IncomeAndExpenses({ chartData }: Props) {
                             dataKey="value"
                             nameKey="type"
                             label
+                            innerRadius={40}
                         >
                             <LabelList
                                 dataKey="type"

@@ -5,10 +5,7 @@ import {
     Bar,
     BarChart,
     CartesianGrid,
-    Label,
     LabelList,
-    Pie,
-    PieChart,
     XAxis,
 } from "recharts";
 
@@ -73,7 +70,6 @@ export function CategoriesVsExpenses({ chartData }: Props) {
                         <Bar
                             dataKey="expenses"
                             fill="var(--color-expenses)"
-                            radius={4}
                         >
                             <LabelList
                                 position="top"
@@ -85,7 +81,6 @@ export function CategoriesVsExpenses({ chartData }: Props) {
                         <Bar
                             dataKey="income"
                             fill="var(--color-income)"
-                            radius={4}
                         >
                             <LabelList
                                 position="top"

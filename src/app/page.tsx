@@ -29,7 +29,8 @@ export default async function Home() {
     const categoriesVsExpensesData = res.data.data.categories;
 
     const incomeVsExpensesData = res.data.data.incomeVsExpenses;
-    console.log(incomeVsExpensesData);
+
+    const monthlyData = res.data.data.monthly;
 
     // const categoriesVsExpensesData = [
     //     { category: "entertainment", expenses: 1369, income: 123 },
@@ -122,7 +123,7 @@ export default async function Home() {
                         />
                         <IncomeAndExpenses chartData={incomeVsExpensesData} />
                     </div>
-                    <MonthlyExpenses />
+                    <MonthlyExpenses chartData={monthlyData} />
                 </div>
                 <Sheet>
                     <SheetTrigger asChild>
