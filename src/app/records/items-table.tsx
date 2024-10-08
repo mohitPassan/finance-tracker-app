@@ -13,39 +13,43 @@ import {
 } from "@/components/ui/sheet";
 import { ItemsForm } from "./items-form";
 import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 type Props = {
     items: ItemsType[];
 };
 
 const ItemsTable = ({ items }: Props) => {
+    const queryClient = useQueryClient();
     const router = useRouter();
-    const [dataToUpdate, setDataToUpdate] = useState<ItemsType>();
     const [sheetOpen, setSheetOpen] = useState(false);
+    const deleteMutation = useMutation({
+        mutationFn: ({ id }: { id: string }) => {
+            return axios.delete(`/api/v1/items/${id}`);
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["records"] });
+        },
+    });
+    const [idToUpdate, setIdToUpdate] = useState<string>("");
+    const itemQuery = useQuery({
+        queryKey: ["item"],
+        queryFn: async () => {
+            const res = await axios.get<{ data: ItemsType }>(
+                `/api/v1/items/${idToUpdate}`
+            );
+            return res.data.data;
+        },
+        enabled: idToUpdate !== "",
+    });
 
     const handleDelete = (id: string) => {
-        axios
-            .delete(`/api/v1/items/${id}`)
-            .then(() => {
-                router.refresh();
-            })
-            .catch((err) => {
-                console.error(`Error while deleting. Error: ${err}`);
-            });
+        deleteMutation.mutate({ id });
     };
 
     const handleUpdate = (id: string) => {
         setSheetOpen(true);
-        axios
-            .get<{ data: ItemsType }>(
-                `/api/v1/items/${id}`
-            )
-            .then((res) => {
-                setDataToUpdate(res.data.data);
-            })
-            .catch((err) => {
-                console.error(`Error while updating. Error: ${err}`);
-            });
+        setIdToUpdate(id);
     };
 
     const handleSubmit = () => {
@@ -64,7 +68,7 @@ const ItemsTable = ({ items }: Props) => {
                     <SheetHeader>
                         <SheetTitle>Update record</SheetTitle>
                         <ItemsForm
-                            initialData={dataToUpdate}
+                            initialData={itemQuery.data}
                             isEditing={true}
                             handleSubmit={handleSubmit}
                         />

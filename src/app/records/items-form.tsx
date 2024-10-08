@@ -22,8 +22,8 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 import { ItemsType } from "./columns";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
     item: z.string(),
@@ -39,7 +39,59 @@ type Props = {
 };
 
 const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
-    const router = useRouter();
+    const queryClient = useQueryClient();
+    const addItemMutation = useMutation({
+        mutationFn: ({
+            item,
+            cost,
+            type,
+            category,
+        }: {
+            type: "debit" | "credit";
+            item: string;
+            cost: number;
+            category: string;
+        }) => {
+            return axios.post(`/api/v1/item`, {
+                name: item,
+                cost: cost,
+                type: type,
+                category_id: category,
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["records"] });
+        },
+    });
+    const updateItemMutation = useMutation({
+        mutationFn: ({
+            id,
+            item,
+            cost,
+            type,
+            category,
+        }: {
+            id: string | undefined;
+            type: "debit" | "credit";
+            item: string;
+            cost: number;
+            category: string;
+        }) => {
+            return axios.patch(`/api/v1/update/item`, {
+                id: id,
+                name: item,
+                cost: cost,
+                type: type,
+                category_id: category,
+            });
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["records"] });
+            if (handleSubmit) {
+                handleSubmit();
+            }
+        },
+    });
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -59,29 +111,11 @@ const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (isEditing) {
-            axios.patch(`/api/v1/update/item`, {
-                id: initialData?.id,
-                name: values.item,
-                cost: values.cost,
-                type: values.type,
-                category_id: values.category,
-            });
-
-            if (handleSubmit) {
-                handleSubmit();
-            }
-
+            updateItemMutation.mutate({ id: initialData?.id, ...values });
             return;
         }
 
-        await axios.post(`/api/v1/item`, {
-            name: values.item,
-            cost: values.cost,
-            type: values.type,
-            category_id: values.category,
-        });
-
-        router.refresh();
+        addItemMutation.mutate({ ...values });
     }
 
     return (
