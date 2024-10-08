@@ -10,7 +10,7 @@ export default async function Home() {
     const queryClient = new QueryClient();
 
     await queryClient.prefetchQuery({
-        queryKey: ["items"],
+        queryKey: ["dashboard"],
         queryFn: async () => {
             const res = await axios.get(
                 `${process.env.SERVER_URL}/api/v1/dashboard-data`

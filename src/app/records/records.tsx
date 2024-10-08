@@ -1,7 +1,7 @@
 "use client";
 
 import { ModeToggle } from "@/components/theme-toggle";
-import { ItemsForm } from "./records/items-form";
+import axios from "axios";
 import Link from "next/link";
 import { CircleUser, Menu, Plus } from "lucide-react";
 import {
@@ -20,36 +20,29 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CategoriesVsExpenses } from "./categoriesVsExpenses";
-import { IncomeAndExpenses } from "./incomeAndExpenses";
-import { MonthlyExpenses } from "./monthlyExpenses";
+import { ItemsType } from "./columns";
+import { ItemsTable } from "./items-table";
+import { ItemsForm } from "./items-form";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
 
-export const HomePage = () => {
-    const dashboardQuery = useQuery({
-        queryKey: ["dashboard"],
+export const Records = () => {
+    const itemsQuery = useQuery({
+        queryKey: ["records"],
         queryFn: async () => {
-            const res = await axios.get(`/api/v1/dashboard-data`);
+            const res = await axios.get<{ data: ItemsType[] }>(`/api/v1/items`);
             return res.data.data;
         },
     });
 
-    if(dashboardQuery.status === 'pending') {
-        return <p>Loading...</p>
-    }
-    
-    if(dashboardQuery.status === 'error') {
-        return <p>Error...</p>
+    if (itemsQuery.status === "pending") {
+        return <p>Loading...</p>;
     }
 
-    const dashboardData = dashboardQuery.data;
+    if (itemsQuery.status === "error") {
+        return <p>Error...</p>;
+    }
 
-    const categoriesVsExpensesData = dashboardData.categories;
-
-    const incomeVsExpensesData = dashboardData.incomeVsExpenses;
-
-    const monthlyData = dashboardData.monthly;
+    const items = itemsQuery.data;
 
     return (
         <div className="flex flex-col gap-5 items-center">
@@ -57,13 +50,13 @@ export const HomePage = () => {
                 <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
                     <Link
                         href="/"
-                        className="text-foreground transition-colors hover:text-foreground"
+                        className="text-muted-foreground transition-colors hover:text-foreground"
                     >
                         Dashboard
                     </Link>
                     <Link
                         href="/records"
-                        className="text-muted-foreground transition-colors hover:text-foreground"
+                        className="text-foreground transition-colors hover:text-foreground"
                     >
                         Records
                     </Link>
@@ -85,13 +78,13 @@ export const HomePage = () => {
                         <nav className="grid gap-6 text-lg font-medium">
                             <Link
                                 href="/"
-                                className="text-foreground hover:text-foreground"
+                                className="text-muted-foreground hover:text-foreground"
                             >
                                 Dashboard
                             </Link>
                             <Link
                                 href="/records"
-                                className="text-muted-foreground hover:text-foreground"
+                                className="text-foreground hover:text-foreground"
                             >
                                 Records
                             </Link>
@@ -129,16 +122,8 @@ export const HomePage = () => {
                     </div>
                 </div>
             </header>
-            <div className="md:w-4/5 w-full pb-16">
-                <div className="grid grid-cols-1 gap-4 p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <CategoriesVsExpenses
-                            chartData={categoriesVsExpensesData}
-                        />
-                        <IncomeAndExpenses chartData={incomeVsExpensesData} />
-                    </div>
-                    <MonthlyExpenses chartData={monthlyData} />
-                </div>
+            <div className="md:w-4/5 w-11/12 pb-20">
+                <ItemsTable items={items} />
                 <Sheet>
                     <SheetTrigger asChild>
                         <Button
