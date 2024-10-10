@@ -4,7 +4,6 @@ import axios from "axios";
 // import { useMutation } from "@tanstack/react-query";
 import { getColumns, ItemsType } from "./columns";
 import { DataTable } from "../data-table";
-import { useRouter } from "next/navigation";
 import {
     Sheet,
     SheetContent,
@@ -21,7 +20,6 @@ type Props = {
 
 const ItemsTable = ({ items }: Props) => {
     const queryClient = useQueryClient();
-    const router = useRouter();
     const [sheetOpen, setSheetOpen] = useState(false);
     const deleteMutation = useMutation({
         mutationFn: ({ id }: { id: string }) => {
@@ -53,7 +51,6 @@ const ItemsTable = ({ items }: Props) => {
     };
 
     const handleSubmit = () => {
-        router.refresh();
         setSheetOpen(false);
     };
 
@@ -63,7 +60,12 @@ const ItemsTable = ({ items }: Props) => {
                 columns={getColumns(handleDelete, handleUpdate)}
                 data={items}
             />
-            <Sheet open={sheetOpen}>
+            <Sheet
+                open={sheetOpen}
+                onOpenChange={(open) => {
+                    setSheetOpen(open);
+                }}
+            >
                 <SheetContent>
                     <SheetHeader>
                         <SheetTitle>Update record</SheetTitle>

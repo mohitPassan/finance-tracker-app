@@ -61,6 +61,9 @@ const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["records"] });
+            if (handleSubmit) {
+                handleSubmit();
+            }
         },
     });
     const updateItemMutation = useMutation({
