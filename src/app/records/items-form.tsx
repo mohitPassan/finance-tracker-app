@@ -24,6 +24,7 @@ import {
 import axios from "axios";
 import { ItemsType } from "./columns";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 
 const formSchema = z.object({
     item: z.string(),
@@ -39,6 +40,8 @@ type Props = {
 };
 
 const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
+    const session = useSession();
+
     const queryClient = useQueryClient();
     const addItemMutation = useMutation({
         mutationFn: ({
@@ -57,10 +60,12 @@ const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
                 cost: cost,
                 type: type,
                 category_id: category,
+                user_id: session.data?.user?.id,
             });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["records"] });
+            queryClient.invalidateQueries({ queryKey: ["dashboard"] });
             if (handleSubmit) {
                 handleSubmit();
             }
@@ -111,6 +116,10 @@ const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
             category: initialData ? initialData.category_id : "",
         },
     });
+
+    if (!session.data?.user) {
+        return <div>No user</div>;
+    }
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         if (isEditing) {

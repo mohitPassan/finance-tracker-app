@@ -26,11 +26,15 @@ import axios from "axios";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 
-export const HomePage = () => {
+type Props = {
+    userId?: string;
+}
+
+export const HomePage = ({ userId }: Props) => {
     const dashboardQuery = useQuery({
         queryKey: ["dashboard"],
         queryFn: async () => {
-            const res = await axios.get(`/api/v1/dashboard-data`);
+            const res = await axios.get(`/api/v1/dashboard-data?user_id=${userId}`);
             return res.data.data;
         },
     });

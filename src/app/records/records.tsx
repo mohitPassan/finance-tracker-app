@@ -26,11 +26,15 @@ import { ItemsForm } from "./items-form";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-export const Records = () => {
+type Props = {
+    userId?: string;
+}
+
+export const Records = ({ userId }: Props) => {
     const itemsQuery = useQuery({
         queryKey: ["records"],
         queryFn: async () => {
-            const res = await axios.get<{ data: ItemsType[] }>(`/api/v1/items`);
+            const res = await axios.get<{ data: ItemsType[] }>(`/api/v1/items?user_id=${userId}`);
             return res.data.data;
         },
     });

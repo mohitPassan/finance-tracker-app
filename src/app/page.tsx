@@ -16,12 +16,13 @@ export default async function Home() {
     }
 
     const queryClient = new QueryClient();
+    const userId = session.user.id;
 
     await queryClient.prefetchQuery({
         queryKey: ["dashboard"],
         queryFn: async () => {
             const res = await axios.get(
-                `${process.env.SERVER_URL}/api/v1/dashboard-data`
+                `${process.env.SERVER_URL}/api/v1/dashboard-data?user_id=${userId}`
             );
             return res.data.data;
         },
@@ -29,7 +30,7 @@ export default async function Home() {
 
     return (
         <HydrationBoundary state={dehydrate(queryClient)}>
-            <HomePage />
+            <HomePage userId={userId} />
         </HydrationBoundary>
     );
 }
