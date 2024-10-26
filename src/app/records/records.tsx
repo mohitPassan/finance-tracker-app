@@ -24,15 +24,21 @@ import { ItemsType } from "./columns";
 import { ItemsTable } from "./items-table";
 import { ItemsForm } from "./items-form";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
-export const Records = () => {
+type Props = {
+    userId?: string;
+}
+
+export const Records = ({ userId }: Props) => {
     const itemsQuery = useQuery({
         queryKey: ["records"],
         queryFn: async () => {
-            const res = await axios.get<{ data: ItemsType[] }>(`/api/v1/items`);
+            const res = await axios.get<{ data: ItemsType[] }>(`/api/v1/items?user_id=${userId}`);
             return res.data.data;
         },
     });
+    const [sheetOpen, setSheetOpen] = useState(false);
 
     if (itemsQuery.status === "pending") {
         return <p>Loading...</p>;
@@ -43,6 +49,10 @@ export const Records = () => {
     }
 
     const items = itemsQuery.data;
+
+    const handleSubmit = () => {
+        setSheetOpen(false);
+    };
 
     return (
         <div className="flex flex-col gap-5 items-center">
@@ -124,7 +134,10 @@ export const Records = () => {
             </header>
             <div className="md:w-4/5 w-11/12 pb-20">
                 <ItemsTable items={items} />
-                <Sheet>
+                <Sheet
+                    open={sheetOpen}
+                    onOpenChange={(open) => setSheetOpen(open)}
+                >
                     <SheetTrigger asChild>
                         <Button
                             size="icon"
@@ -136,7 +149,7 @@ export const Records = () => {
                     <SheetContent>
                         <SheetHeader>
                             <SheetTitle>Add a new record</SheetTitle>
-                            <ItemsForm />
+                            <ItemsForm handleSubmit={handleSubmit} />
                         </SheetHeader>
                     </SheetContent>
                 </Sheet>

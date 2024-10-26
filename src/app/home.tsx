@@ -16,8 +16,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CategoriesVsExpenses } from "./categoriesVsExpenses";
@@ -25,22 +23,29 @@ import { IncomeAndExpenses } from "./incomeAndExpenses";
 import { MonthlyExpenses } from "./monthlyExpenses";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useState } from "react";
+import { signOut } from "next-auth/react";
 
-export const HomePage = () => {
+type Props = {
+    userId?: string;
+}
+
+export const HomePage = ({ userId }: Props) => {
     const dashboardQuery = useQuery({
         queryKey: ["dashboard"],
         queryFn: async () => {
-            const res = await axios.get(`/api/v1/dashboard-data`);
+            const res = await axios.get(`/api/v1/dashboard-data?user_id=${userId}`);
             return res.data.data;
         },
     });
+    const [sheetOpen, setSheetOpen] = useState(false);
 
-    if(dashboardQuery.status === 'pending') {
-        return <p>Loading...</p>
+    if (dashboardQuery.status === "pending") {
+        return <p>Loading...</p>;
     }
-    
-    if(dashboardQuery.status === 'error') {
-        return <p>Error...</p>
+
+    if (dashboardQuery.status === "error") {
+        return <p>Error...</p>;
     }
 
     const dashboardData = dashboardQuery.data;
@@ -50,6 +55,10 @@ export const HomePage = () => {
     const incomeVsExpensesData = dashboardData.incomeVsExpenses;
 
     const monthlyData = dashboardData.monthly;
+
+    const handleSubmit = () => {
+        setSheetOpen(false);
+    };
 
     return (
         <div className="flex flex-col gap-5 items-center">
@@ -116,14 +125,14 @@ export const HomePage = () => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>
+                                {/* <DropdownMenuLabel>
                                     My Account
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>Settings</DropdownMenuItem>
                                 <DropdownMenuItem>Support</DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>Logout</DropdownMenuItem>
+                                <DropdownMenuSeparator /> */}
+                                <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -139,7 +148,10 @@ export const HomePage = () => {
                     </div>
                     <MonthlyExpenses chartData={monthlyData} />
                 </div>
-                <Sheet>
+                <Sheet
+                    open={sheetOpen}
+                    onOpenChange={(open) => setSheetOpen(open)}
+                >
                     <SheetTrigger asChild>
                         <Button
                             size="icon"
@@ -151,7 +163,7 @@ export const HomePage = () => {
                     <SheetContent>
                         <SheetHeader>
                             <SheetTitle>Add a new record</SheetTitle>
-                            <ItemsForm />
+                            <ItemsForm handleSubmit={handleSubmit} />
                         </SheetHeader>
                     </SheetContent>
                 </Sheet>
