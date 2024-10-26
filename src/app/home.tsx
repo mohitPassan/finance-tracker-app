@@ -16,8 +16,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { CategoriesVsExpenses } from "./categoriesVsExpenses";
@@ -26,6 +24,7 @@ import { MonthlyExpenses } from "./monthlyExpenses";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 
 export const HomePage = () => {
     const dashboardQuery = useQuery({
@@ -122,14 +121,14 @@ export const HomePage = () => {
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                                <DropdownMenuLabel>
+                                {/* <DropdownMenuLabel>
                                     My Account
                                 </DropdownMenuLabel>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem>Settings</DropdownMenuItem>
                                 <DropdownMenuItem>Support</DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>Logout</DropdownMenuItem>
+                                <DropdownMenuSeparator /> */}
+                                <DropdownMenuItem onClick={() => signOut()}>Logout</DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
