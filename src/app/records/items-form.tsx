@@ -103,18 +103,13 @@ const ItemsForm = ({ initialData, isEditing = false, handleSubmit }: Props) => {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
-        defaultValues: {
-            item: "",
-            cost: 0,
-            type: "debit",
-            category: "",
-        },
         values: {
             item: initialData ? initialData.name : "",
             cost: initialData ? initialData.cost : 0,
             type: initialData ? initialData.type : "debit",
             category: initialData ? initialData.category_id : "",
         },
+
     });
 
     if (!session.data?.user) {
