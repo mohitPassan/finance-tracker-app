@@ -31,7 +31,7 @@ const ItemsTable = ({ items }: Props) => {
     });
     const [idToUpdate, setIdToUpdate] = useState<string>("");
     const itemQuery = useQuery({
-        queryKey: ["item"],
+        queryKey: ["item", idToUpdate],
         queryFn: async () => {
             const res = await axios.get<{ data: ItemsType }>(
                 `/api/v1/items/${idToUpdate}`
